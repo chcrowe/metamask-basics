@@ -11,13 +11,18 @@ function App() {
   const [currentNetwork, setCurrentNetwork] = useState('Unknown');
   const [errorText, setErrorText] = useState('Waiting on user...');
   const [selectedChainId, setSelectedChainId] = useState('');
+  const [account, setAccount] = useState(null)
 
   const connectWallet = async () => {
     setErrorText('stand by...')
     if (window.ethereum) {
       try {
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
-        setWalletStatus('Connected');
+
+        // Fetch accounts
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
+        setAccount(accounts[0])
+    
+        setWalletStatus('Connected ' + accounts[0]);
         updateCurrentNetwork()        
       } catch (error) {
         setErrorText(`Error ${error.code}: ` + error.message)
@@ -82,7 +87,7 @@ function App() {
         // setWalletNetworks([...walletNetworks, 'Binance Smart Chain']);
         setCurrentNetwork(net.name);
       } catch (error) {
-        setErrorText('Error adding ' + net.name + ": " + error)
+        setErrorText('Error adding ' + net.name + ": " + JSON.stringify(error))
       }
     } else {
       setErrorText("MetaMask is not available in your browser's window.ethereum object.");
